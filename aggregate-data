@@ -12,7 +12,8 @@ else
     source = Net::HTTP.get(URI("http://misshk.tvb.com/2017/contestant.php?ID=#{num}"))
     title = Nokogiri::HTML(source).xpath("//title").children.to_s.split("-")[1].strip
 
-    file_name = "#{title}.php"
+    # terrible wide space
+    file_name = "#{title.gsub(/\s+|\t+|　/, "-")}.php"
     files << file_name
 
     File.open(file_name, 'w') { |file| file.write(source) }
