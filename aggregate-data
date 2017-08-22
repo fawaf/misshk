@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'nokogiri'
+require 'csv'
+
+files = ARGV
+
+header = []
+csv = []
+files.each do |file|
+  f = File.open(file)
+
+  p = Nokogiri::HTML(f)
+
+  hash = {}
+  spans = p.xpath("//span")
+  spans.each_with_index do |s,i|
+    next if i % 2 == 0 || s.text == "Prev"
+    if spans[i + 1]
+      hash[spans[i].text.split('︰')[0]] = spans[i + 1].text
+    end
+  end
+
+  header = hash.keys
+  csv << hash.values.to_csv
+end
+csv.insert(0, header.to_csv)
+
+puts csv
