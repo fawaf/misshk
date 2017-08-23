@@ -3,11 +3,19 @@
 require 'nokogiri'
 require 'csv'
 require 'net/http'
+require 'micro-optparse'
 
+opts = Parser.new do |p|
+  p.banner = "Terrible MissHK parser"
+  p.version = "21.81.5"
+  p.option :refresh_cache, "force refresh of cache"
+end.process!
+
+header = []
+csv = []
 files = []
-if ARGV.length > 0
-  files = ARGV
-else
+
+if opts[:refresh_cache]
   (1..15).each do |num|
     source = Net::HTTP.get(URI("http://misshk.tvb.com/2017/contestant.php?ID=#{num}"))
     title = Nokogiri::HTML(source).xpath("//title").children.to_s.split("-")[1].strip
@@ -20,8 +28,7 @@ else
   end
 end
 
-header = []
-csv = []
+files = Dir.glob("*.php")
 files.each do |file|
   f = File.open(file)
 
