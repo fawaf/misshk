@@ -8,8 +8,12 @@ require 'micro-optparse'
 opts = Parser.new do |p|
   p.banner = "Terrible MissHK parser"
   p.version = "21.81.5"
+
   p.option :refresh_cache, "force refresh of cache"
+  p.option :year, "year", :default => 2017
 end.process!
+
+year = opts[:year]
 
 header = []
 csv = []
@@ -17,24 +21,30 @@ files = []
 
 if opts[:refresh_cache]
   (1..15).each do |num|
-    source = Net::HTTP.get(URI("http://misshk.tvb.com/2017/contestant.php?ID=#{num}"))
+    source = Net::HTTP.get(URI("http://misshk.tvb.com/#{year}/contestant.php?ID=#{num}"))
     title = Nokogiri::HTML(source).xpath("//title").children.to_s.split("-")[1].strip
 
     # terrible wide space
-    file_name = "#{title.gsub(/\s+|\t+|　/, "-")}.php"
+    file_name = "#{year}-#{title.gsub(/\s+|\t+|　/, "-")}.php"
     files << file_name
 
     File.open(file_name, 'w') { |file| file.write(source) }
   end
 end
 
-files = Dir.glob("*.php")
+files = Dir.glob("#{year}-*.php")
 files.each do |file|
   f = File.open(file)
 
   p = Nokogiri::HTML(f)
 
   hash = {}
+
+  div = p.css("div.cname")
+  div.each do |d|
+    hash["name"] = div.text
+  end
+
   spans = p.xpath("//span")
   spans.each_with_index do |s,i|
     next if i % 2 == 0 || s.text == "Prev"
@@ -49,3 +59,7 @@ end
 csv.insert(0, header.to_csv)
 
 puts csv
+
+f = File.open("contestant-data.csv", "w")
+f.write(csv.join(""))
+f.close
