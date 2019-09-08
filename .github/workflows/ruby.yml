@@ -18,6 +18,9 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6.x
+    - name: install gems
+      run: |
+        bundle install
     - name: run script
       run: |
         ./aggregate-data
