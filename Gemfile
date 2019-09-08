@@ -1,3 +1,5 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gem 'micro-optparse'
+gem "micro-optparse"
+gem "nokogiri"
+gem "csv"
