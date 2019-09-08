@@ -7,7 +7,7 @@ require 'micro-optparse'
 
 opts = Parser.new do |p|
   p.banner = "Terrible MissHK parser"
-  p.version = "21.81.5"
+  p.version = "2019.09.08"
 
   p.option :refresh_cache, "force refresh of cache"
   p.option :year, "year", :default => 2017
